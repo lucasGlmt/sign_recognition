@@ -31,3 +31,5 @@ Les poids sont sauvegardés dans le fichier model.h5 disponible dans ce reposito
 
 ## Conclusion
 Pour ce projet, je me suis inspiré de votre exercice sur la classification (chat ou chien) et de mes recherches personnelles.
+
+Si on regarde la courbe d'entrainement, on se rend compte que 12 epochs aurait suffit.
