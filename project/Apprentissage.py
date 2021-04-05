@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 from PIL import Image
 import os
@@ -53,6 +54,27 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
 
 
+batch_size = 32
+img_size = 150
+
+img_gen = ImageDataGenerator(rescale=1./255)
+
+train_img_gen = img_gen.flow_from_directory(batch_size=batch_size,
+                                           directory=X_train,
+                                           shuffle=True,
+                                           target_size=(img_size, img_size),
+                                           class_mode='binary')
+
+test_img_gen = img_gen.flow_from_directory(batch_size=batch_size,
+                                               directory=X_test,
+                                               shuffle=False,
+                                               target_size=(img_size, img_size),
+                                               class_mode=None)
+
+                                               
+
+
+
 ## Architecture du perceptron multicouche
 model = Sequential()
 model.add(Conv2D(filters=32, kernel_size=(5,5), activation='relu', input_shape=X_train.shape[1:]))
@@ -74,7 +96,13 @@ model.summary()
 
 ## Entrainer le model
 
-history = model.fit(X_train, y_train, batch_size=32, epochs=20, validation_data=(X_test, y_test))
+#history = model.fit(X_train, y_train, batch_size=32, epochs=20, validation_data=(X_test, y_test))
+history = model.fit_generator(train_img_gen,
+            steps_per_epoch=int(np.ceil(train_total / float(batch_size))),
+            epochs=12,
+            validation_data=validate_img_gen,
+            validation_steps=int(np.ceil(validate_total / float(batch_size))))
+
 
 ## Sauvegarder le model
 model.save("model.h5")
